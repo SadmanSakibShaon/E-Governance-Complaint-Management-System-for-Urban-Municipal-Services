@@ -9,11 +9,10 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
     <!-- Unified Single Navigation Bar -->
-    <nav class="navbar navbar-expand-lg fixed-top navbar-main">
+    <nav class="navbar navbar-expand-lg fixed-top navbar-main bg-dark text-white">
         <div class="container-fluid">
-            <a class="navbar-brand" href="supervisor-dashboard.html">
+            <a class="navbar-brand text-white" href="supervisor-dashboard.html">
                 <i class="fas fa-city me-2"></i>
                 Municipal Services Portal
             </a>
@@ -22,23 +21,23 @@
             </button>
             <div class="collapse navbar-collapse justify-content-end" id="supervisorMainNav">
                 <ul class="navbar-nav align-items-lg-center me-2 mb-2 mb-lg-0">
-                    <li class="nav-item"><a class="nav-link active" href="supervisor-dashboard.html"><i class="fas fa-tachometer-alt"></i><span> Dashboard</span></a></li>
-                    <li class="nav-item"><a class="nav-link" href="#"><i class="fas fa-clipboard-check"></i><span> Task Assignment</span></a></li>
-                    <li class="nav-item"><a class="nav-link" href="#"><i class="fas fa-chart-line"></i><span> Team Performance</span></a></li>
-                    <li class="nav-item"><a class="nav-link" href="#"><i class="fas fa-users"></i><span> Team Management</span></a></li>
-                    <li class="nav-item"><a class="nav-link" href="#"><i class="fas fa-calendar-alt"></i><span> Schedule</span></a></li>
+                    <li class="nav-item"><a class="nav-link active text-white" href="supervisor-dashboard.html"><i class="fas fa-tachometer-alt me-1"></i><span> Dashboard</span></a></li>
+                    <li class="nav-item"><a class="nav-link text-white" href="#"><i class="fas fa-clipboard-check me-1"></i><span> Task Assignment</span></a></li>
+                    <li class="nav-item"><a class="nav-link text-white" href="#"><i class="fas fa-chart-line me-1"></i><span> Team Performance</span></a></li>
+                    <li class="nav-item"><a class="nav-link text-white" href="#"><i class="fas fa-users me-1"></i><span> Team Management</span></a></li>
+                    <li class="nav-item"><a class="nav-link text-white" href="#"><i class="fas fa-calendar-alt me-1"></i><span> Schedule</span></a></li>
                     <li class="nav-item dropdown me-lg-2">
-                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center text-white" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="fas fa-bell position-relative"></i>
-                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.55rem;">5</span>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.55rem;" id="notificationCount">5</span>
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end">
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationDropdown">
                             <li><h6 class="dropdown-header">Notifications</h6></li>
                             <li><a class="dropdown-item" href="#"><i class="fas fa-exclamation-triangle text-warning me-2"></i>High priority complaint</a></li>
                             <li><a class="dropdown-item" href="#"><i class="fas fa-clock text-info me-2"></i>Assignment pending</a></li>
                         </ul>
                     </li>
-                    <li class="nav-item"><button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i><span>Logout</span></button></li>
+                    <li class="nav-item"><button class="logout-btn btn btn-outline-light" onclick="logout()"><i class="fas fa-sign-out-alt me-1"></i><span>Logout</span></button></li>
                 </ul>
             </div>
         </div>
@@ -47,30 +46,29 @@
     <!-- Main Content -->
     <div class="main-content single-nav">
         <!-- Page Content -->
-        <div class="container-fluid mt-4">
+        <div class="container-fluid mt-5 pt-3">
             <div class="card shadow-sm mb-4">
                 <div class="card-header">
                     <h4 class="mb-0">Unassigned Complaints (Water Works Dept.)</h4>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table table-hover">
+                        <table class="table table-hover" role="grid" aria-describedby="unassignedComplaintsInfo">
                             <thead>
                                 <tr>
-                                    <th>Complaint ID</th>
-                                    <th>Priority</th>
-                                    <th>Date Routed</th>
-                                    <th>Action</th>
+                                    <th scope="col">Complaint ID</th>
+                                    <th scope="col">Priority</th>
+                                    <th scope="col">Date Routed</th>
+                                    <th scope="col">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
+                                <tr class="table-row-hover">
                                     <td>#CMPT-00130</td>
                                     <td><span class="badge bg-danger">Urgent</span></td>
                                     <td>2025-08-24</td>
-                                    <td><button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#assignTechnicianModal">Assign Technician</button></td>
+                                    <td><button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#assignTechnicianModal" onclick="setModalComplaintId('CMPT-00130')">Assign Technician</button></td>
                                 </tr>
-                                <!-- More rows -->
                             </tbody>
                         </table>
                     </div>
@@ -83,25 +81,24 @@
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table table-hover">
+                        <table class="table table-hover" role="grid" aria-describedby="activeComplaintsInfo">
                             <thead>
                                 <tr>
-                                    <th>Complaint ID</th>
-                                    <th>Technician</th>
-                                    <th>Status</th>
-                                    <th>Time Elapsed</th>
-                                    <th>Action</th>
+                                    <th scope="col">Complaint ID</th>
+                                    <th scope="col">Technician</th>
+                                    <th scope="col">Status</th>
+                                    <th scope="col">Time Elapsed</th>
+                                    <th scope="col">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
+                                <tr class="table-row-hover">
                                     <td>#CMPT-00128</td>
                                     <td>আবুল কালাম</td>
                                     <td><span class="badge bg-warning text-dark">In Progress</span></td>
                                     <td>3 days</td>
-                                    <td><button class="btn btn-sm btn-danger">Escalate</button></td>
+                                    <td><button class="btn btn-sm btn-danger" onclick="escalateComplaint('CMPT-00128')">Escalate</button></td>
                                 </tr>
-                                <!-- More rows -->
                             </tbody>
                         </table>
                     </div>
@@ -115,21 +112,21 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="assignTechnicianModalLabel">Assign Technician to #CMPT-00130</h5>
+                    <h5 class="modal-title" id="assignTechnicianModalLabel">Assign Technician to <span id="complaintId">Complaint</span></h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <p>Select an available technician from your team.</p>
-                    <select class="form-select">
-                        <option selected>Choose technician...</option>
-                        <option>আবুল কালাম (২টি কাজ)</option>
-                        <option>ফাতেমা খাতুন (১টি কাজ)</option>
-                        <option>রফিকুল ইসলাম (৪টি কাজ)</option>
+                    <select class="form-select" id="technicianSelect" aria-label="Select technician">
+                        <option selected disabled>Choose technician...</option>
+                        <option value="abul-kalam">আবুল কালাম (২টি কাজ)</option>
+                        <option value="fatema-khatun">ফাতেমা খাতুন (১টি কাজ)</option>
+                        <option value="rafiqul-islam">রফিকুল ইসলাম (৪টি কাজ)</option>
                     </select>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary">Confirm Assignment</button>
+                    <button type="button" class="btn btn-primary" onclick="assignTechnician()">Confirm Assignment</button>
                 </div>
             </div>
         </div>
