@@ -9,11 +9,10 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
     <!-- Unified Single Navigation Bar -->
-    <nav class="navbar navbar-expand-lg fixed-top navbar-main">
+    <nav class="navbar navbar-expand-lg fixed-top navbar-main bg-dark text-white">
         <div class="container-fluid">
-            <a class="navbar-brand" href="technician-dashboard.html">
+            <a class="navbar-brand text-white" href="technician-dashboard.html">
                 <i class="fas fa-city me-2"></i>
                 Municipal Services Portal
             </a>
@@ -22,23 +21,23 @@
             </button>
             <div class="collapse navbar-collapse justify-content-end" id="technicianMainNav">
                 <ul class="navbar-nav align-items-lg-center me-2 mb-2 mb-lg-0">
-                    <li class="nav-item"><a class="nav-link active" href="technician-dashboard.html"><i class="fas fa-tachometer-alt"></i><span> Dashboard</span></a></li>
-                    <li class="nav-item"><a class="nav-link" href="#"><i class="fas fa-wrench"></i><span> Assigned Tasks</span></a></li>
-                    <li class="nav-item"><a class="nav-link" href="#"><i class="fas fa-check-circle"></i><span> Work Orders</span></a></li>
-                    <li class="nav-item"><a class="nav-link" href="#"><i class="fas fa-tools"></i><span> Equipment</span></a></li>
-                    <li class="nav-item"><a class="nav-link" href="#"><i class="fas fa-clock"></i><span> Time Tracking</span></a></li>
+                    <li class="nav-item"><a class="nav-link active text-white" href="technician-dashboard.html"><i class="fas fa-tachometer-alt me-1"></i><span> Dashboard</span></a></li>
+                    <li class="nav-item"><a class="nav-link text-white" href="#"><i class="fas fa-wrench me-1"></i><span> Assigned Tasks</span></a></li>
+                    <li class="nav-item"><a class="nav-link text-white" href="#"><i class="fas fa-check-circle me-1"></i><span> Work Orders</span></a></li>
+                    <li class="nav-item"><a class="nav-link text-white" href="#"><i class="fas fa-tools me-1"></i><span> Equipment</span></a></li>
+                    <li class="nav-item"><a class="nav-link text-white" href="#"><i class="fas fa-clock me-1"></i><span> Time Tracking</span></a></li>
                     <li class="nav-item dropdown me-lg-2">
-                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center text-white" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="fas fa-bell position-relative"></i>
-                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.55rem;">2</span>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.55rem;" id="notificationCount">2</span>
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end">
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationDropdown">
                             <li><h6 class="dropdown-header">Notifications</h6></li>
                             <li><a class="dropdown-item" href="#"><i class="fas fa-wrench text-warning me-2"></i>New assignment</a></li>
                             <li><a class="dropdown-item" href="#"><i class="fas fa-clock text-info me-2"></i>Status update required</a></li>
                         </ul>
                     </li>
-                    <li class="nav-item"><button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i><span>Logout</span></button></li>
+                    <li class="nav-item"><button class="logout-btn btn btn-outline-light" onclick="logout()"><i class="fas fa-sign-out-alt me-1"></i><span>Logout</span></button></li>
                 </ul>
             </div>
         </div>
@@ -47,27 +46,34 @@
     <!-- Main Content -->
     <div class="main-content single-nav">
         <!-- Page Content -->
-        <div class="container-fluid mt-4">
+        <div class="container-fluid mt-5 pt-3">
             <h3 class="my-3">Today's Work Orders</h3>
-        <div class="list-group">
-            <!-- Work Order Card 1 -->
-            <a href="#" class="list-group-item list-group-item-action flex-column align-items-start mb-3 shadow-sm">
-                <div class="d-flex w-100 justify-content-between">
-                    <h5 class="mb-1">#CMPT-00128 - Streetlight Outage</h5>
-                    <small><span class="badge bg-danger">High Priority</span></small>
+            <div class="list-group">
+                <!-- Work Order Card 1 -->
+                <div class="list-group-item list-group-item-action flex-column align-items-start mb-3 shadow-sm work-order-card">
+                    <div class="d-flex w-100 justify-content-between align-items-center">
+                        <h5 class="mb-1">#CMPT-00128 - Streetlight Outage</h5>
+                        <span class="badge bg-danger">High Priority</span>
+                    </div>
+                    <p class="mb-1"><i class="fas fa-map-marker-alt me-2"></i>Corner of Oak Avenue and 5th Street</p>
+                    <div class="d-flex justify-content-between">
+                        <small>Assigned 3 days ago.</small>
+                        <button class="btn btn-sm btn-primary" onclick="viewDetails('CMPT-00128')">View Details</button>
+                    </div>
                 </div>
-                <p class="mb-1"><i class="fas fa-map-marker-alt me-2"></i>Corner of Oak Avenue and 5th Street</p>
-                <small>Assigned 3 days ago.</small>
-            </a>
-            <!-- Work Order Card 2 -->
-            <a href="#" class="list-group-item list-group-item-action flex-column align-items-start mb-3 shadow-sm">
-                <div class="d-flex w-100 justify-content-between">
-                    <h5 class="mb-1">#CMPT-00131 - Park Maintenance</h5>
-                    <small><span class="badge bg-warning text-dark">Medium Priority</span></small>
+                <!-- Work Order Card 2 -->
+                <div class="list-group-item list-group-item-action flex-column align-items-start mb-3 shadow-sm work-order-card">
+                    <div class="d-flex w-100 justify-content-between align-items-center">
+                        <h5 class="mb-1">#CMPT-00131 - Park Maintenance</h5>
+                        <span class="badge bg-warning text-dark">Medium Priority</span>
+                    </div>
+                    <p class="mb-1"><i class="fas fa-map-marker-alt me-2"></i>Central City Park</p>
+                    <div class="d-flex justify-content-between">
+                        <small>Assigned today.</small>
+                        <button class="btn btn-sm btn-primary" onclick="viewDetails('CMPT-00131')">View Details</button>
+                    </div>
                 </div>
-                <p class="mb-1"><i class="fas fa-map-marker-alt me-2"></i>Central City Park</p>
-                <small>Assigned today.</small>
-            </a>
+            </div>
         </div>
     </div>
 
