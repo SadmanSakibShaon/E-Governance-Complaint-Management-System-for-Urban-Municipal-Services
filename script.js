@@ -75,7 +75,7 @@ function redirectToLogin(message) {
     }
     sessionStorage.removeItem('userRole');
     sessionStorage.removeItem('isLoggedIn');
-    window.location.href = 'login.html';
+    window.location.href = 'index.html';
 }
 
 // Login Functions for Different Roles
