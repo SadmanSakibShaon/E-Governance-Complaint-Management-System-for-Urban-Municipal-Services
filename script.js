@@ -17,6 +17,12 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
+    // Initialize map display
+    initializeMapDisplay();
+
+    // Initialize real maps
+    initializeRealMaps();
+
     // Check user authentication on page load
     checkUserAuthentication();
 
@@ -684,4 +690,392 @@ function createToastContainer() {
     container.style.zIndex = '1055';
     document.body.appendChild(container);
     return container;
+}
+
+// Map Display Initialization
+function initializeMapDisplay() {
+    const bangladeshMap = document.getElementById('bangladesh-map');
+    const mapFallback = document.querySelector('.map-fallback');
+    
+    if (bangladeshMap) {
+        // Check if image loads successfully
+        bangladeshMap.onload = function() {
+            console.log('Bangladesh map loaded successfully');
+            this.style.display = 'block';
+            if (mapFallback) {
+                mapFallback.style.display = 'none';
+            }
+        };
+        
+        bangladeshMap.onerror = function() {
+            console.log('Bangladesh map failed to load, showing fallback');
+            this.style.display = 'none';
+            if (mapFallback) {
+                mapFallback.style.display = 'flex';
+            }
+        };
+        
+        // Force check if image is already loaded (cached)
+        if (bangladeshMap.complete) {
+            if (bangladeshMap.naturalWidth > 0) {
+                bangladeshMap.onload();
+            } else {
+                bangladeshMap.onerror();
+            }
+        }
+    }
+    
+    // Initialize map placeholders
+    const mapPlaceholders = document.querySelectorAll('#map-placeholder');
+    mapPlaceholders.forEach(placeholder => {
+        // Add hover effect
+        placeholder.addEventListener('mouseenter', function() {
+            this.style.transform = 'scale(1.02)';
+            this.style.transition = 'transform 0.3s ease, box-shadow 0.3s ease';
+            this.style.boxShadow = '0 4px 15px rgba(0,0,0,0.1)';
+        });
+        
+        placeholder.addEventListener('mouseleave', function() {
+            this.style.transform = 'scale(1)';
+            this.style.boxShadow = 'none';
+        });
+    });
+}
+
+// Map interaction functions
+function openMapSelector() {
+    showAlert('🗺️ Interactive map integration coming soon! This will allow you to select the exact location of your complaint.', 'info');
+    
+    // Simulate map opening animation
+    const placeholder = document.getElementById('map-placeholder');
+    if (placeholder) {
+        placeholder.style.transform = 'scale(0.95)';
+        setTimeout(() => {
+            placeholder.style.transform = 'scale(1)';
+        }, 200);
+    }
+}
+
+function viewOnMap() {
+    showAlert('🔍 Map view feature will open the exact location with detailed markers and surrounding landmarks.', 'info');
+}
+
+function getDirections() {
+    showAlert('🧭 Navigation feature will provide step-by-step directions to the complaint location.', 'info');
+}
+
+function trackComplaint() {
+    showAlert('📍 Real-time complaint tracking on map will show the current status and assigned officer location.', 'info');
+}
+
+// Real Map Implementation with Leaflet
+let complaintMap = null;
+let selectedMarker = null;
+let complaintLocationMap = null;
+
+function initializeRealMaps() {
+    // Initialize map for citizen complaint form
+    if (document.getElementById('map')) {
+        initializeComplaintSelectionMap();
+    }
+    
+    // Initialize map for officer complaint detail
+    if (document.getElementById('complaint-map')) {
+        initializeComplaintLocationMap();
+    }
+}
+
+function initializeComplaintSelectionMap() {
+    // Default to Dhaka, Bangladesh
+    const dhakaLat = 23.8103;
+    const dhakaLng = 90.4125;
+    
+    complaintMap = L.map('map').setView([dhakaLat, dhakaLng], 13);
+    
+    // Add OpenStreetMap tiles
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors',
+        maxZoom: 19
+    }).addTo(complaintMap);
+    
+    // Add click event to select location
+    complaintMap.on('click', function(e) {
+        selectLocationOnMap(e.latlng.lat, e.latlng.lng, 'Selected Location');
+    });
+    
+    // Try to get user's current location on initial load
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+            const userLat = position.coords.latitude;
+            const userLng = position.coords.longitude;
+            
+            // Center map on user location
+            complaintMap.setView([userLat, userLng], 15);
+            
+        }, function(error) {
+            console.log('Geolocation error:', error);
+        });
+    }
+}
+
+function selectLocationOnMap(lat, lng, locationName = 'Selected Location') {
+    // Remove previous marker
+    if (selectedMarker) {
+        complaintMap.removeLayer(selectedMarker);
+    }
+    
+    // Add new marker
+    selectedMarker = L.marker([lat, lng], {
+        icon: L.icon({
+            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+        })
+    }).addTo(complaintMap);
+    
+    // Store coordinates
+    document.getElementById('selectedLat').value = lat;
+    document.getElementById('selectedLng').value = lng;
+    
+    // Show selected location info
+    updateSelectedLocationDisplay(lat, lng);
+    
+    // Show clear button
+    const clearBtn = document.getElementById('clearLocationBtn');
+    if (clearBtn) {
+        clearBtn.style.display = 'inline-block';
+    }
+    
+    // Reverse geocode to get address
+    reverseGeocode(lat, lng);
+    
+    // Show confirmation popup
+    selectedMarker.bindPopup(`
+        <div class="text-center">
+            <i class="fas fa-map-marker-alt text-danger mb-2"></i><br>
+            <strong>${locationName}</strong><br>
+            <small>Lat: ${lat.toFixed(6)}<br>Lng: ${lng.toFixed(6)}</small><br>
+            <button class="btn btn-sm btn-outline-danger mt-2" onclick="clearSelectedLocation()">
+                <i class="fas fa-times me-1"></i>Remove
+            </button>
+        </div>
+    `).openPopup();
+    
+    showAlert('📍 Location selected successfully!', 'success');
+}
+
+function useMyLocation() {
+    if (navigator.geolocation) {
+        // Show loading state
+        const btn = event.target;
+        const originalContent = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Getting Location...';
+        btn.disabled = true;
+        
+        navigator.geolocation.getCurrentPosition(function(position) {
+            const userLat = position.coords.latitude;
+            const userLng = position.coords.longitude;
+            
+            // Center map on user location
+            complaintMap.setView([userLat, userLng], 17);
+            
+            // Select this location
+            selectLocationOnMap(userLat, userLng, 'My Current Location');
+            
+            // Restore button
+            btn.innerHTML = originalContent;
+            btn.disabled = false;
+            
+            showAlert('📍 Your current location has been selected!', 'success');
+            
+        }, function(error) {
+            // Restore button
+            btn.innerHTML = originalContent;
+            btn.disabled = false;
+            
+            let errorMessage = 'Could not get your location. ';
+            switch(error.code) {
+                case error.PERMISSION_DENIED:
+                    errorMessage += 'Location access was denied. Please allow location access and try again.';
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    errorMessage += 'Location information is unavailable.';
+                    break;
+                case error.TIMEOUT:
+                    errorMessage += 'Location request timed out.';
+                    break;
+                default:
+                    errorMessage += 'An unknown error occurred.';
+                    break;
+            }
+            showAlert(errorMessage, 'error');
+        }, {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 60000
+        });
+    } else {
+        showAlert('Geolocation is not supported by this browser.', 'error');
+    }
+}
+
+function clearSelectedLocation() {
+    // Remove marker from map
+    if (selectedMarker) {
+        complaintMap.removeLayer(selectedMarker);
+        selectedMarker = null;
+    }
+    
+    // Clear form fields
+    document.getElementById('selectedLat').value = '';
+    document.getElementById('selectedLng').value = '';
+    document.getElementById('selectedAddress').value = '';
+    
+    // Hide location info and clear button
+    const locationInfo = document.getElementById('selectedLocationInfo');
+    const clearBtn = document.getElementById('clearLocationBtn');
+    
+    if (locationInfo) {
+        locationInfo.style.display = 'none';
+    }
+    
+    if (clearBtn) {
+        clearBtn.style.display = 'none';
+    }
+    
+    showAlert('📍 Location selection cleared', 'info');
+}
+
+function updateSelectedLocationDisplay(lat, lng) {
+    const locationInfo = document.getElementById('selectedLocationInfo');
+    const locationText = document.getElementById('selectedLocationText');
+    
+    if (locationInfo && locationText) {
+        locationText.innerHTML = `
+            <strong>Coordinates:</strong> ${lat.toFixed(6)}, ${lng.toFixed(6)}<br>
+            <span id="addressText"><i class="fas fa-spinner fa-spin"></i> Getting address...</span>
+        `;
+        locationInfo.style.display = 'block';
+    }
+}
+
+function initializeComplaintLocationMap() {
+    // Sample complaint location (near central library in Dhaka)
+    const complaintLat = 23.7285;
+    const complaintLng = 90.3842;
+    
+    complaintLocationMap = L.map('complaint-map').setView([complaintLat, complaintLng], 16);
+    
+    // Add OpenStreetMap tiles
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors',
+        maxZoom: 19
+    }).addTo(complaintLocationMap);
+    
+    // Add complaint location marker
+    const complaintMarker = L.marker([complaintLat, complaintLng], {
+        icon: L.icon({
+            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+        })
+    }).addTo(complaintLocationMap);
+    
+    complaintMarker.bindPopup(`
+        <div class="text-center">
+            <i class="fas fa-exclamation-triangle text-warning mb-2"></i><br>
+            <strong>Complaint Location</strong><br>
+            <small>Near Central Library</small><br>
+            <small class="text-muted">Lat: ${complaintLat}<br>Lng: ${complaintLng}</small>
+        </div>
+    `).openPopup();
+}
+
+function reverseGeocode(lat, lng) {
+    // Simple reverse geocoding using Nominatim (OpenStreetMap)
+    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`)
+        .then(response => response.json())
+        .then(data => {
+            if (data && data.display_name) {
+                document.getElementById('selectedAddress').value = data.display_name;
+                
+                // Update display
+                const addressText = document.getElementById('addressText');
+                if (addressText) {
+                    addressText.innerHTML = `<strong>Address:</strong> ${data.display_name}`;
+                }
+            }
+        })
+        .catch(error => {
+            console.log('Reverse geocoding error:', error);
+            const addressText = document.getElementById('addressText');
+            if (addressText) {
+                addressText.innerHTML = '<strong>Address:</strong> Unable to get address';
+            }
+        });
+}
+
+function centerOnComplaint() {
+    if (complaintLocationMap) {
+        const complaintLat = 23.7285;
+        const complaintLng = 90.3842;
+        complaintLocationMap.setView([complaintLat, complaintLng], 18);
+        showAlert('🎯 Centered on complaint location', 'success');
+    }
+}
+
+function getDirectionsToComplaint() {
+    const complaintLat = 23.7285;
+    const complaintLng = 90.3842;
+    
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+            const userLat = position.coords.latitude;
+            const userLng = position.coords.longitude;
+            
+            // Open directions in external map application
+            const directionsUrl = `https://www.openstreetmap.org/directions?engine=fossgis_osrm_car&route=${userLat}%2C${userLng}%3B${complaintLat}%2C${complaintLng}`;
+            window.open(directionsUrl, '_blank');
+        }, function(error) {
+            // Fallback: open map centered on complaint location
+            const fallbackUrl = `https://www.openstreetmap.org/?mlat=${complaintLat}&mlon=${complaintLng}&zoom=16`;
+            window.open(fallbackUrl, '_blank');
+            showAlert('Could not get your location. Opening complaint location instead.', 'info');
+        });
+    } else {
+        const fallbackUrl = `https://www.openstreetmap.org/?mlat=${complaintLat}&mlon=${complaintLng}&zoom=16`;
+        window.open(fallbackUrl, '_blank');
+        showAlert('Geolocation not supported. Opening complaint location instead.', 'info');
+    }
+}
+
+// User Management Functions
+function editUser(userId) {
+    showAlert(`📝 Edit user ${userId} functionality will be implemented soon!`, 'info');
+}
+
+function deleteUser(userId, userName) {
+    if (confirm(`⚠️ Are you sure you want to delete the account for "${userName}"?\n\nThis action cannot be undone.`)) {
+        // Simulate account deletion
+        showAlert(`🗑️ Account for "${userName}" has been deleted successfully.`, 'success');
+        
+        // Here you would typically make an API call to delete the user
+        // For demo purposes, we'll just show a confirmation
+        console.log(`Deleting user: ${userId} - ${userName}`);
+    }
+}
+
+function activateUser(userId) {
+    if (confirm(`✅ Are you sure you want to activate this suspended account?`)) {
+        showAlert(`✅ User account ${userId} has been activated successfully.`, 'success');
+        
+        // Here you would typically make an API call to activate the user
+        console.log(`Activating user: ${userId}`);
+    }
 }
